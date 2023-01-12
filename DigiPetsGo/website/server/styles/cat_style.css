@@ -1,0 +1,53 @@
+:root {
+    --cat-height: 152px;
+    --cat-width: 238px;
+    --steps: 8;
+}
+.cat-background {
+    height: fit-content;
+    width: 100%;
+    margin: 20px 0;
+    background-color: #fff;
+    overflow-x: hidden;
+}
+.cat-container-running {
+    animation: cat-running 8s linear infinite normal;
+    height: fit-content;
+    width: fit-content;
+}
+@keyframes cat-running {
+    from {
+        transform: translate(calc(100vw + var(--cat-width)), 0);
+    }
+    to {
+        transform: translate(calc(var(--cat-width) * (-1)), 0);
+    }
+}
+.sprite-cat-vertical {
+    height: calc(var(--cat-height) - 10px); /*here we also need to solve the problem of a badly cut image*/
+    width: var(--cat-width);
+
+    background: url(https://raw.githubusercontent.com/6Fein/images/main/code-pen-running-cat-animation/cat-vertical.jpg) 0 0/cover no-repeat #fff;
+
+    animation: sprite-cat-vertical calc(var(--steps) * 0.07s)/*0.56s*/ steps(var(--steps)) infinite normal;
+}
+@keyframes sprite-cat-vertical {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 0 calc(var(--cat-height) * (-1) * var(--steps)); /*background-position: 0 -1216px;*/
+    }
+}
+.heart-icon {
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+}
+.cat-container-running:hover,
+.sprite-cat-vertical:hover {
+    animation-play-state: paused;
+}
+.heart-icon:hover {
+    background: url(https://raw.githubusercontent.com/6Fein/images/main/code-pen-running-cat-animation/heart-icon.png) 100px 10px/20px no-repeat transparent;
+}

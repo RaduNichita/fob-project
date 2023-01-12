@@ -1,0 +1,21 @@
+version: '3.6'
+
+services:
+  influxdb:
+    image: influxdb:1.8
+    volumes:
+      - influxdb-volume:/var/lib/influxdb
+    networks:
+      app-network:
+        ipv4_address: 172.25.2.1
+
+volumes:
+  influxdb-volume:
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.25.2.0/16"
