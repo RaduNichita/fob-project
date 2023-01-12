@@ -1,6 +1,12 @@
 <!doctype html>
 <html>
 <head>
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="//storage.googleapis.com/code.getmdl.io/1.0.1/material.teal-red.min.css" />
+    <script src="//storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>
+    <script src="https://kit.fontawesome.com/320d6fe4a2.js" crossorigin="anonymous"></script>
+
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;1,500&display=swap" rel="stylesheet">
@@ -30,10 +36,36 @@
         </div>
     </div>
     <div class="mdl-grid">
-        <div class="mdl-cell mdl-cell--8-col">
+        <div class="mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-color--purple-100 mdl-color-text--white">
+                    <h2 class="mdl-card__title-text"><b>Your profile</b></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    <h5><i class="fa-regular fa-user"></i> <%= username %> </h5>
+                    <h5><i class="fa-regular fa-envelope"></i> <%= email %> </h5>
+                    <p style="text-align: center;">
+                        <button class="button button1" style="vertical-align:middle"><span>Edit profile</span></button>
+                        <button class="button button1" style="vertical-align:middle"><span>Delete profile</span></button>
+                    </p>
+                </div>
         </div>
 
-        <div class="mdl-cell mdl-cell--4-col">
+        <div class="mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title mdl-color--red-100 mdl-color-text--white">
+                <h2 class="mdl-card__title-text"><b>Card Title</b></h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <h5>ABC<h5>
+            </div>
+        </div>
+
+        <div class="mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title mdl-color--deep-orange-100 mdl-color-text--white">
+                <h2 class="mdl-card__title-text"><b>Card Title</b></h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <h5>ABC<h5>
+            </div>
         </div>
     </div>
 </body>

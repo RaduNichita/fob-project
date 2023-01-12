@@ -22,26 +22,56 @@ header .overlay{
 }
 
 h1 {
-	font-family: 'Nunito', italic;
+	font-family: 'Nunito';
 	font-size: 80px;
 	margin-bottom: 30px;
 }
 
-h2, h3, p {
+h2, h3, h4, h5, p {
 	font-family: 'Nunito';
 	margin-bottom: 30px;
 }
 
-button {
-	border: none;
-	outline: none;
-	padding: 10px 20px;
-	border-radius: 50px;
-	color: #333;
-	background: #fff;
-	margin-bottom: 50px;
-	box-shadow: 0 3px 20px 0 #0000003b;
+.button {
+    display: inline-block;
+    border-radius: 4px;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-family: 'Nunito';
+    font-size: 18px;
+    padding: 20px;
+    width: 180px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
 }
-button:hover{
-	cursor: pointer;
+
+.button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.button:hover span {
+    padding-right: 25px;
+}
+
+.button:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.button1 {
+    background-color: #e1bee7;
 }
