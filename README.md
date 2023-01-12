@@ -21,6 +21,9 @@ character.
 * Radu Nichita
 * Cristian-Petrisor Descultu
 
+## InfluxDb tutorial
+First, connect to the shell of the InfluxDB container. Start InfluxDB using command `influx`. To list all existent databases, use `show databases`; if not already present, crate the `digipetsgo` database using `create database digipetsgo`. 
+
 ## Requirements:
 - apt-get install nodejs
 - npm i cors
