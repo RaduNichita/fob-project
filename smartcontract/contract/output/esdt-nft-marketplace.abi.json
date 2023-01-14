@@ -1,0 +1,235 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.66.0-nightly",
+            "commitHash": "7fcf850d7942804990a1d2e3fe036622a0fe4c74",
+            "commitDate": "2022-10-23",
+            "channel": "Nightly",
+            "short": "rustc 1.66.0-nightly (7fcf850d7 2022-10-23)"
+        },
+        "contractCrate": {
+            "name": "esdt-nft-marketplace",
+            "version": "0.0.0",
+            "git_version": "f8c6ea6-modified"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.33.1"
+        }
+    },
+    "name": "BuySell",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "token_identifier",
+                "type": "optional<EgldOrEsdtTokenIdentifier>",
+                "multi_arg": true
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "docs": [
+                "\\n     * Any address can send an nft, from the collection accepted by this contract.\\n     * The nft will be sold by bid_apartment method when 2 addresses will bid\\n     "
+            ],
+            "name": "send_nft",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "end_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_allowed_participants",
+                    "type": "u16"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "\\n    * Allow 2 addresses to fight for a nft.\\n    * The address with the highest egld sent will win\\n    "
+            ],
+            "name": "getRegisteringTax",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getEndTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getMaxAllowedParticipants",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "getParticipantAddrByName",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "participant_name",
+                    "type": "utf-8 string"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getParticipantInfo",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "participant_addr",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "utf-8 string"
+                }
+            ]
+        },
+        {
+            "name": "getParticipants",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getBidders",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getBidderInfo",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "participant_addr",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getBlockTokenIdentifier",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EgldOrEsdtTokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getBidNft",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "getNftSender",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "bid_participant",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "transfer_nft",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "register_participant",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "participant_name",
+                    "type": "utf-8 string"
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "events": [],
+    "hasCallback": false,
+    "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
+}
