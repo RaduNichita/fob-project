@@ -2,6 +2,7 @@
 
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN="D"
+blockchain_cli="mxpy"
 
 ISSUE_ADDRESS="erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
 
@@ -29,7 +30,7 @@ AUCTION_DURATION=500 # in seconds
 AUCTION_MAX_PARTICIPANTS=0x5
 
 function create_wallet() {
-	erdpy wallet new --pem --output-path $1.pem
+	$blockchain_cli wallet new --pem --output-path $1.pem
 }
 
 function convert_to_hex_helper() {
@@ -41,7 +42,7 @@ function convert_to_hex() {
 }
 
 function convert_contract_address_to_hex() {
-	echo "0x"$(mxpy wallet bech32 --decode $1)
+	echo "0x"$($blockchain_cli wallet bech32 --decode $1)
 }
 
 function get_token_identifier() {
@@ -53,7 +54,7 @@ function issue_nft() {
 	nft_token_name_encoded=$(convert_to_hex $NFT_TOKEN_NAME)
 	nft_token_ticker_encoded=$(convert_to_hex $NFT_TOKEN_TICKER)
 	
-	mxpy contract call $ISSUE_ADDRESS \
+	$blockchain_cli contract call $ISSUE_ADDRESS \
 		--function "issueNonFungible" \
 		--pem $WALLET_PATH \
 		--gas-limit 100000000 \
@@ -73,7 +74,7 @@ function set_role_nft() {
 	create_role_encoded=$(convert_to_hex $role)
 	get_token_identifier_encoded=$(convert_to_hex $(get_token_identifier))
 
-	mxpy contract call $ISSUE_ADDRESS \
+	$blockchain_cli contract call $ISSUE_ADDRESS \
 		--function "setSpecialRole" \
 		--pem $WALLET_PATH \
 		--gas-limit 100000000 \
@@ -95,7 +96,7 @@ function create_nft() {
 	nft_attributes_encoded=$(convert_to_hex $NFT_ATTRIBUTES)
 	nft_url_encoded=$(convert_to_hex $NFT_URL)
 
-	erdpy contract call $WALLET_ADDRESS \
+	$blockchain_cli contract call $WALLET_ADDRESS \
 	--function "ESDTNFTCreate" \
 	--pem $WALLET_PATH \
 	--gas-limit=10000000 \
@@ -127,7 +128,7 @@ function transfer_nft_to_smart_contract() {
 	argument2_encoded=$(convert_to_hex $argument2)
 
 
-	erdpy contract call $WALLET_ADDRESS \
+	$blockchain_cli contract call $WALLET_ADDRESS \
 	--function "ESDTNFTTransfer" \
 	--pem $WALLET_PATH \
 	--gas-limit=10000000 \
@@ -143,7 +144,7 @@ function transfer_nft_to_smart_contract() {
 function register_participant() {
 	participant_name_encoded=$(convert_to_hex $2)
 
-	erdpy contract call $SMART_CONTRACT_ADDRESS \
+	$blockchain_cli contract call $SMART_CONTRACT_ADDRESS \
 	--function "register_participant" \
 	--pem $1 \
 	--gas-limit=10000000 \
@@ -158,7 +159,7 @@ function register_participant() {
 # second parameter - amount to bid
 function bid_participant() {
 
-	erdpy contract call $SMART_CONTRACT_ADDRESS \
+	$blockchain_cli contract call $SMART_CONTRACT_ADDRESS \
 	--function "bid_participant" \
 	--pem $1\
 	--gas-limit=10000000 \
@@ -171,7 +172,7 @@ function bid_participant() {
 
 # only owner
 function transfer_nft() {
-	erdpy contract call $SMART_CONTRACT_ADDRESS \
+	$blockchain_cli contract call $SMART_CONTRACT_ADDRESS \
 	--function "transfer_nft" \
 	--pem $WALLET_PATH \
 	--gas-limit=10000000 \
