@@ -6,10 +6,10 @@ CHAIN="D"
 ISSUE_ADDRESS="erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
 
 WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru" # Change if you want to use other user
-WALLET_PATH="~/ping-pong/wallet/wallet-owner.pem" # Change if you want to use other user
+WALLET_PATH="~/fob-project/wallets/wallet.pem" # Change if you want to use other user
 
 OWNER_WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru"
-OWNER_WALLET_PATH="~/ping-pong/wallet/wallet-owner.pem" # Change if you want to use other user
+OWNER_WALLET_PATH="~/fob-project/wallets/wallet.pem" # Change if you want to use other user
 
 ALICE_WALLET_ADDRESS=
 _WALLET_PATH=
@@ -186,4 +186,4 @@ function transfer_nft() {
 # transfer_nft_to_smart_contract 1
 # register_participant $1 $2
 # bid_participant $1 $2
-transfer_nft
+# transfer_nft

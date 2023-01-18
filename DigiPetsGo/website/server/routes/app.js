@@ -295,6 +295,16 @@ router.get('/dashboard/:username', (req, res) => {
     })
 });
 
+router.get('/newdigipet/:username', (req, res) => {
+    const { exec } = require("child_process");
+
+    exec('bash -c "source ~/fob-project/smartcontract/contract/interactions/playground.sh && create_nft"', (error, stdout, stderr) => {
+        console.log(`${stderr}`)
+        console.log(`${stdout}`)
+        res.redirect('/dashboard/' + req.params.username);
+    });
+});
+
 router.get('/logout', function(req, res) {
     res.clearCookie('token');
     res.redirect('/login');
