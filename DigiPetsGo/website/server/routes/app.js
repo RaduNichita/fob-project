@@ -89,29 +89,39 @@ router.post('/register', (req, res) => {
                                 });
                             } else {
                                 // Insert new user into the "userdata" collection
-                                const newUser = {
-                                    username: req.body.username,
-                                    email: req.body.email,
-                                    password: hash,
-                                    first_name: req.body.first_name,
-                                    last_name: req.body.last_name,
-                                };
+                                const { exec } = require("child_process");
 
-                                db.collection("userdata").insertOne(newUser, function(err) {
-                                    if (err) {
-                                        client.close();
-                                        res.render('register',{
-                                            message: err
-                                        });
-                                    }
+                                exec("erdpy wallet derive wallet.pem", (error, stdout, stderr) => {
+                                    exec("cat wallet.pem", (error, stdout, stderr) => {
+                                        // Insert new user into the "userdata" collection
+                                        const newUser = {
+                                            username: req.body.username,
+                                            email: req.body.email,
+                                            password: hash,
+                                            first_name: req.body.first_name,
+                                            last_name: req.body.last_name,
+                                            wallet: `${stdout}`
+                                        };
 
-                                    console.log("Inserted new user!");
-                                    client.close();
-                                    res.render('login',{
-                                        after_register: 'yes',
-                                        message: 'The account was successfully registered! Use the same credentials to login.'
+                                        db.collection("userdata").insertOne(newUser, function(err) {
+                                            if (err) {
+                                                exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
+                                                client.close();
+                                                res.render('register',{
+                                                    message: err
+                                                });
+                                            }
+
+                                            console.log("Inserted new user!");
+                                            exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
+                                            client.close();
+                                            res.render('login',{
+                                                after_register: 'yes',
+                                                message: 'The account was successfully registered! Use the same credentials to login.'
+                                            });
+                                        })
                                     });
-                                })
+                                });
                             }
                         });
                     }
@@ -135,30 +145,39 @@ router.post('/register', (req, res) => {
                                 message: err
                             });
                         } else {
-                            // Insert new user into the "userdata" collection
-                            const newUser = {
-                                username: req.body.username,
-                                email: req.body.email,
-                                password: hash,
-                                first_name: req.body.first_name,
-                                last_name: req.body.last_name,
-                            };
+                            const { exec } = require("child_process");
 
-                            db.collection("userdata").insertOne(newUser, function(err) {
-                                if (err) {
-                                    client.close();
-                                    res.render('register',{
-                                        message: err
-                                    });
-                                }
+                            exec("erdpy wallet derive wallet.pem", (error, stdout, stderr) => {
+                                exec("cat wallet.pem", (error, stdout, stderr) => {
+                                    // Insert new user into the "userdata" collection
+                                    const newUser = {
+                                        username: req.body.username,
+                                        email: req.body.email,
+                                        password: hash,
+                                        first_name: req.body.first_name,
+                                        last_name: req.body.last_name,
+                                        wallet: `${stdout}`
+                                    };
 
-                                console.log("Inserted new user!");
-                                client.close();
-                                res.render('login',{
-                                    after_register: 'yes',
-                                    message: 'The account was successfully registered! Use the same credentials to login.'
+                                    db.collection("userdata").insertOne(newUser, function(err) {
+                                        if (err) {
+                                            exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
+                                            client.close();
+                                            res.render('register',{
+                                                message: err
+                                            });
+                                        }
+
+                                        console.log("Inserted new user!");
+                                        exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
+                                        client.close();
+                                        res.render('login',{
+                                            after_register: 'yes',
+                                            message: 'The account was successfully registered! Use the same credentials to login.'
+                                        });
+                                    })
                                 });
-                            })
+                            });
                         }
                     });
                 });
