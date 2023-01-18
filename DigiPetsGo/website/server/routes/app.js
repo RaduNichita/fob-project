@@ -7,6 +7,8 @@ const TIME_INTERVAL = 60 * 60 * 5 * 1000;
 var jwt = require('jsonwebtoken');
 var request = require('request-promise');
 var uniqid = require('uniqid');
+var NFTS_COUNT = 21;
+var NFT_TOKEN_TICKER_IDENTIFIER="RMC-ce2cc0"
 
 // Import the MongoDB driver
 const MongoClient = require('mongodb').MongoClient;
@@ -20,7 +22,6 @@ const dbName = 'digipetsgo';
 router.get('/', (req, res) => {
     res.redirect('/login');
 });
-
 
 router.get('/register', (req, res) => {
     res.render('register',{
@@ -237,7 +238,6 @@ router.post('/login', (req, res) => {
 
                         res.cookie('token', token, {maxAge: TIME_INTERVAL, httpOnly: true});
                         res.cookie('username', user.username, {maxAge: TIME_INTERVAL, httpOnly: true});
-
                         res.redirect('/dashboard/' + user.username);
                     } else{
                         res.render('login',{
@@ -255,6 +255,7 @@ router.post('/login', (req, res) => {
         });
     });
 });
+
 
 router.get('/dashboard/:username', (req, res) => {
     const client = new MongoClient(url);
@@ -299,9 +300,67 @@ router.get('/newdigipet/:username', (req, res) => {
     const { exec } = require("child_process");
 
     exec('bash -c "source ~/fob-project/smartcontract/contract/interactions/playground.sh && create_nft"', (error, stdout, stderr) => {
-        console.log(`${stderr}`)
-        console.log(`${stdout}`)
-        res.redirect('/dashboard/' + req.params.username);
+        let lines = `${stderr}`.split('\n');
+        let words = lines[4].split(':');
+        devnet_link = words[3].substring(1) + ':' + words[4];
+
+        // Create a new MongoClient
+        const client = new MongoClient(url);
+
+        // Use connect method to connect to the server
+        client.connect(function(err) {
+            if (err) {
+                console.log('Error connecting to DB!');
+                client.close();
+            }
+
+            // Connected successfully
+            const db = client.db(dbName);
+            console.log('Connected successfully to digipetsgo!');
+
+            db.listCollections({name: "pets"})
+                .next(function(err, collinfo) {
+                if (collinfo) {
+                    // The "pets" collection exists
+                    console.log("The pets collection exists")
+
+                    const newPet = {
+                        count: NFTS_COUNT,
+                        owner: req.params.username
+                    };
+
+                    db.collection("pets").insertOne(newPet, function(err) {
+                        client.close();
+                    });
+                } else {
+                    // Create the "pets" collection
+                    db.createCollection("pets", function(err) {
+                        if (err) {
+                            client.close();
+                        }
+
+                        console.log("Created pets collection")
+
+                        const newPet = {
+                            count: NFTS_COUNT,
+                            owner: req.params.username
+                        };
+
+                        db.collection("pets").insertOne(newPet, function(err) {
+                            client.close();
+                        });
+
+                    });
+                }
+            });
+        });
+
+        res.render('newdigipet', {
+            username: req.params.username,
+            devnet_link: devnet_link,
+        });
+
+        NFTS_COUNT++;
     });
 });
 
