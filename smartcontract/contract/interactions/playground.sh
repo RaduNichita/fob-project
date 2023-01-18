@@ -11,14 +11,15 @@ WALLET_PATH="~/ping-pong/wallet/wallet-owner.pem" # Change if you want to use ot
 OWNER_WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru"
 OWNER_WALLET_PATH="~/ping-pong/wallet/wallet-owner.pem" # Change if you want to use other user
 
-ALICE_ADDRESS
+ALICE_WALLET_ADDRESS=
+_WALLET_PATH=
 
 
-SMART_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqemjc83e2gstkhjs065mdz59aut3k6fwfu37qcd2vuy"
+SMART_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqc6n95pm3rauxmwjllzktcdw2v96u3kr9u37qdkctcz"
 
 NFT_TOKEN_NAME="RaduMaraCristi"
 NFT_TOKEN_TICKER="RMC"
-NFT_TOKEN_TICKER_IDENTIFIER="b96bab" # You need to change this
+NFT_TOKEN_TICKER_IDENTIFIER="ce2cc0" # You need to change this
 
 NFT_NAME="DigiPet"
 NFT_ATTRIBUTES="tags:happy,quiet,paceful"
@@ -26,6 +27,10 @@ NFT_URL="www.google.com"
 
 AUCTION_DURATION=500 # in seconds
 AUCTION_MAX_PARTICIPANTS=0x5
+
+function create_wallet() {
+	erdpy wallet new --pem --output-path $1.pem
+}
 
 function convert_to_hex_helper() {
 	echo -n $1 | hexdump -ve '/1 "%02x"'
@@ -132,12 +137,14 @@ function transfer_nft_to_smart_contract() {
 	--send
 }
 
+# first parameter - path to user_wallet
+# second_parameter - user name
 function register_participant() {
-	participant_name_encoded=$(convert_to_hex $1)
+	participant_name_encoded=$(convert_to_hex $2)
 
 	erdpy contract call $SMART_CONTRACT_ADDRESS \
 	--function "register_participant" \
-	--pem $WALLET_PATH \
+	--pem $1 \
 	--gas-limit=10000000 \
 	--recall-nonce \
 	--arguments $participant_name_encoded \
@@ -146,20 +153,23 @@ function register_participant() {
 	--send
 }
 
+# first parameter - path to user_wallet
+# second parameter - amount to bid
 function bid_participant() {
 
 	erdpy contract call $SMART_CONTRACT_ADDRESS \
 	--function "bid_participant" \
-	--pem $WALLET_PATH \
+	--pem $1\
 	--gas-limit=10000000 \
 	--recall-nonce \
-	--value 50000000 \
+	--value $2 \
 	--chain $CHAIN \
 	--proxy $PROXY \
 	--send
 }
 
-function transfer_nft_to_winner() {
+# only owner
+function transfer_nft() {
 	erdpy contract call $SMART_CONTRACT_ADDRESS \
 	--function "transfer_nft" \
 	--pem $WALLET_PATH \
@@ -173,7 +183,7 @@ function transfer_nft_to_winner() {
 # issue_nft
 # set_role_nft
 # create_nft
-# transfer_nft_to_smart_contract 3
-# register_participant "gigel"
-# bid_participant
-transfer_nft_to_winner
+# transfer_nft_to_smart_contract 1
+# register_participant $1 $2
+# bid_participant $1 $2
+transfer_nft
