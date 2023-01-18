@@ -93,33 +93,37 @@ router.post('/register', (req, res) => {
 
                                 exec("erdpy wallet derive wallet.pem", (error, stdout, stderr) => {
                                     exec("cat wallet.pem", (error, stdout, stderr) => {
-                                        // Insert new user into the "userdata" collection
-                                        const newUser = {
-                                            username: req.body.username,
-                                            email: req.body.email,
-                                            password: hash,
-                                            first_name: req.body.first_name,
-                                            last_name: req.body.last_name,
-                                            wallet: `${stdout}`
-                                        };
+                                        exec("erdpy wallet pem-address wallet.pem", (error, wallet_erd, stderr) => {
+                                            // Insert new user into the "userdata" collection
+                                            console.log(wallet_erd);
+                                            const newUser = {
+                                                username: req.body.username,
+                                                email: req.body.email,
+                                                password: hash,
+                                                first_name: req.body.first_name,
+                                                last_name: req.body.last_name,
+                                                wallet: `${stdout}`,
+                                                erd: wallet_erd
+                                            };
 
-                                        db.collection("userdata").insertOne(newUser, function(err) {
-                                            if (err) {
+                                            db.collection("userdata").insertOne(newUser, function(err) {
+                                                if (err) {
+                                                    exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
+                                                    client.close();
+                                                    res.render('register',{
+                                                        message: err
+                                                    });
+                                                }
+
+                                                console.log("Inserted new user!");
                                                 exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
                                                 client.close();
-                                                res.render('register',{
-                                                    message: err
+                                                res.render('login',{
+                                                    after_register: 'yes',
+                                                    message: 'The account was successfully registered! Use the same credentials to login.'
                                                 });
-                                            }
-
-                                            console.log("Inserted new user!");
-                                            exec("rm -rf wallet.pem", (error, stdout, stderr) => {});
-                                            client.close();
-                                            res.render('login',{
-                                                after_register: 'yes',
-                                                message: 'The account was successfully registered! Use the same credentials to login.'
-                                            });
-                                        })
+                                            })
+                                        });
                                     });
                                 });
                             }
