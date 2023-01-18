@@ -1,16 +1,27 @@
 version: '3.6'
 
+# services:
+#   influxdb:
+#     image: influxdb:1.8
+#     volumes:
+#       - influxdb-volume:/var/lib/influxdb
+#     networks:
+#       app-network:
+#         ipv4_address: 172.25.2.1
+
 services:
-  influxdb:
-    image: influxdb:1.8
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
     volumes:
-      - influxdb-volume:/var/lib/influxdb
+      - mongodb-volume:/data/db
     networks:
       app-network:
         ipv4_address: 172.25.2.1
 
 volumes:
-  influxdb-volume:
+  mongodb-volume:
 
 networks:
   app-network:

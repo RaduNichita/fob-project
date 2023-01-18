@@ -75,3 +75,9 @@ h2, h3, h4, h5, p {
 .button1 {
     background-color: #e1bee7;
 }
+
+.button2 {
+    background-color: #FFFFFF;
+    color: #ffab91;
+    font-weight: bold;
+}

@@ -8,6 +8,14 @@ var jwt = require('jsonwebtoken');
 var request = require('request-promise');
 var uniqid = require('uniqid');
 
+// Import the MongoDB driver
+const MongoClient = require('mongodb').MongoClient;
+
+// Connection URL
+const url = 'mongodb://localhost:27017';
+
+// Database Name
+const dbName = 'digipetsgo';
 
 router.get('/', (req, res) => {
     res.redirect('/login');
@@ -36,64 +44,127 @@ router.post('/register', (req, res) => {
         });
     }
 
-    const Influx = require('influx');
-    const influx= new Influx.InfluxDB({
-      host:     HOST,
-      database: 'digipetsgo',
-    });
+    // Create a new MongoClient
+    const client = new MongoClient(url);
 
-    module.exports=influx;
+    // Use connect method to connect to the server
+    client.connect(function(err) {
+        if (err) {
+            console.log('Error connecting to DB!');
+            client.close();
+            return res.render('register',{
+                message: err
+            });
+        }
 
-    influx.query(`select * from userdata where email='${req.body.email}' or username='${req.body.username}'`)
-    .then(user=> {
-        if (user.length === 0) {
-            // There is no user registered with this email
-            const rounds = 10;
-            bcrypt.hash(password, rounds, (err, hash) => {
-                if(err) {
-                    return res.render('register', {
-                        message: err
-                    });
-                } else {
-                    // Add the new user to the database
-                    influx.writePoints([
-                        {
-                            measurement: 'userdata',
-                            tags: {
+        // Connected successfully
+        const db = client.db(dbName);
+        console.log('Connected successfully to digipetsgo!');
+
+        db.listCollections({name: "userdata"})
+            .next(function(err, collinfo) {
+            if (collinfo) {
+                // The "userdata" collection exists
+                console.log("The userdata collection exists")
+
+                // Find if username or email is already in use
+                db.collection('userdata').find({
+                $or: [
+                    { email: req.body.email },
+                    { username: req.body.username }
+                ]
+                }).toArray(function(err, docs) {
+                    console.log(docs);
+                    if (docs.length > 0) {
+                        console.log("The email or username is already used by another person!");
+                        return res.render('register',{
+                            message: "The email or username is already used by another person!"
+                        });
+                    } else {
+                        const rounds = 10;
+                        bcrypt.hash(password, rounds, (err, hash) => {
+                            if(err) {
+                                return res.render('register', {
+                                    message: err
+                                });
+                            } else {
+                                // Insert new user into the "userdata" collection
+                                const newUser = {
+                                    username: req.body.username,
+                                    email: req.body.email,
+                                    password: hash,
+                                    first_name: req.body.first_name,
+                                    last_name: req.body.last_name,
+                                };
+
+                                db.collection("userdata").insertOne(newUser, function(err) {
+                                    if (err) {
+                                        client.close();
+                                        res.render('register',{
+                                            message: err
+                                        });
+                                    }
+
+                                    console.log("Inserted new user!");
+                                    client.close();
+                                    res.render('login',{
+                                        after_register: 'yes',
+                                        message: 'The account was successfully registered! Use the same credentials to login.'
+                                    });
+                                })
+                            }
+                        });
+                    }
+                });
+            } else {
+                // Create the "userdata" collection
+                db.createCollection("userdata", function(err) {
+                    if (err) {
+                        client.close();
+                        return res.render('register', {
+                            message: err
+                        });
+                    }
+
+                    console.log("Created userdata collection")
+
+                    const rounds = 10;
+                    bcrypt.hash(password, rounds, (err, hash) => {
+                        if(err) {
+                            return res.render('register', {
+                                message: err
+                            });
+                        } else {
+                            // Insert new user into the "userdata" collection
+                            const newUser = {
                                 username: req.body.username,
                                 email: req.body.email,
-                        },
-                            fields: {
                                 password: hash,
                                 first_name: req.body.first_name,
                                 last_name: req.body.last_name,
-                            },
+                            };
+
+                            db.collection("userdata").insertOne(newUser, function(err) {
+                                if (err) {
+                                    client.close();
+                                    res.render('register',{
+                                        message: err
+                                    });
+                                }
+
+                                console.log("Inserted new user!");
+                                client.close();
+                                res.render('login',{
+                                    after_register: 'yes',
+                                    message: 'The account was successfully registered! Use the same credentials to login.'
+                                });
+                            })
                         }
-                    ])
-                    .then(() => {
-                        res.render('login',{
-                            after_register: 'yes',
-                            message: 'The account was successfully registered! Use the same credentials to login.'
-                        });
-                    })
-                    .catch(err =>{
-                        res.render('register',{
-                            message: err
-                        });
-                    })
-                }
-            });
-        } else {
-            return res.render('register',{
-                message: "The email or username is already used by another person!"
-            });
-        }
-    })
-    .catch(err=>{
-        return res.render('register',{
-            message: err
+                    });
+                });
+            }
         });
-    })
+    });
 });
 
 router.get('/login', (req, res) => {
@@ -107,84 +178,101 @@ router.post('/login', (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
 
-    const Influx = require('influx');
-    const influx= new Influx.InfluxDB({
-      host:     HOST,
-      database: 'digipetsgo',
-    });
+    // Create a new MongoClient
+    const client = new MongoClient(url);
 
-    module.exports=influx;
-
-    influx.query(`select * from userdata where username='${username}'`)
-    .then(users=> {
-        if (users.length == 0) {
-            res.render('login',{
-                after_register: '',
-                message: "There is no user registered with this email address!"
+    // Use connect method to connect to the server
+    client.connect(function(err) {
+        if (err) {
+            console.log('Error connecting to DB!');
+            client.close();
+            return res.render('login',{
+                message: err
             });
-        } else {
-            const user = users[0]
-
-            bcrypt.compare(password, user.password, (err,result) => {
-                if(err){
-                    res.render('login',{
-                        after_register: '',
-                        message: err
-                    });
-                }
-
-                if(result){
-                    const token = jwt.sign({
-                            email: user.email,
-                            userId: user.username
-                        }, 'secret', {expiresIn: '5h'});
-
-                    res.cookie('token', token, {maxAge: TIME_INTERVAL, httpOnly: true});
-                    res.cookie('username', user.username, {maxAge: TIME_INTERVAL, httpOnly: true});
-
-                    res.redirect('/dashboard/' + user.username);
-                } else{
-                    res.render('login',{
-                        after_register: '',
-                        message: 'Incorrect username or password, try again!'
-                    });
-                }
-            })
         }
-    })
-    .catch(err=>{
-        console.log(err);
-        res.render('login',{
-            after_register: '',
-            message: err
+
+        // Connected successfully
+        const db = client.db(dbName);
+        console.log('Connected successfully to digipetsgo!');
+
+        // Find if username or email is already in use
+        db.collection('userdata').find({ username: req.body.username
+        }).toArray(function(err, docs) {
+            console.log(docs);
+            if (docs.length > 0) {
+                // User exists, check password
+                let user = docs[0];
+                bcrypt.compare(password, user.password, (err, result) => {
+                    if(err){
+                        res.render('login',{
+                            after_register: '',
+                            message: err
+                        });
+                    }
+
+                    if(result){
+                        const token = jwt.sign({
+                                email: user.email,
+                                userId: user.username
+                            }, 'secret', {expiresIn: '5h'});
+
+                        res.cookie('token', token, {maxAge: TIME_INTERVAL, httpOnly: true});
+                        res.cookie('username', user.username, {maxAge: TIME_INTERVAL, httpOnly: true});
+
+                        res.redirect('/dashboard/' + user.username);
+                    } else{
+                        res.render('login',{
+                            after_register: '',
+                            message: 'Incorrect username or password, try again!'
+                        });
+                    }
+                })
+            } else {
+                res.render('login',{
+                    after_register: '',
+                    message: "There is no user registered with this username!"
+                });
+            }
         });
-    })
+    });
 });
 
 router.get('/dashboard/:username', (req, res) => {
-    const Influx = require('influx');
-    const influx= new Influx.InfluxDB({
-      host:     HOST,
-      database: 'digipetsgo',
-    });
+    const client = new MongoClient(url);
 
-    module.exports=influx;
+    // Use connect method to connect to the server
+    client.connect(function(err) {
+        if (err) {
+            console.log('Error connecting to DB!');
+            client.close();
+            return res.render('login',{
+                message: err
+            });
+        }
 
-    influx.query(`select * from userdata where username='${req.params.username}'`)
-    .then(users=> {
-        const user = users[0]
-        res.render('dashboard', {
-            first_name: user.first_name,
-            last_name: user.last_name,
-            username: user.username,
-            email: user.email,
-        });
-    })
-    .catch(err=>{
-        res.render('login',{
-            after_register: '',
-            message: err
-        });
+        // Connected successfully
+        const db = client.db(dbName);
+        console.log('Connected successfully to digipetsgo!');
+
+        db.collection('userdata').find({ username: req.params.username
+        }).toArray(function(err, docs) {
+            console.log(docs);
+            if (docs.length > 0) {
+                // User exists,
+                let user = docs[0];
+                res.render('dashboard', {
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    username: user.username,
+                    email: user.email,
+                });
+            } else {
+                res.render('login',{
+                    after_register: '',
+                    message: err
+                });
+            }
+        })
     })
 });
 
