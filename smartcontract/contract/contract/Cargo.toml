@@ -1,0 +1,18 @@
+[package]
+name = "esdt-nft-marketplace"
+version = "0.0.0"
+authors = ["Dorin Iancu <dorin.iancu@elrond.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+path = "src/marketplace_main.rs"
+
+[dependencies.elrond-wasm]
+version = "0.33.0"
+
+[dependencies.elrond-wasm-modules]
+version = "0.33.0"
+
+[dev-dependencies.elrond-wasm-debug]
+version = "0.33.0"

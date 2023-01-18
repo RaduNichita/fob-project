@@ -1,0 +1,20 @@
+{
+    "configurations": {
+        "default": {
+            "proxy": "https://devnet-api.elrond.com",
+            "chain": "D"
+        }
+    },
+    "contract":{
+        "deploy":{
+	    "chain" : "D",
+            "verbose": true,
+            "bytecode": "output/esdt-nft-marketplace.wasm",
+            "recall-nonce": true,
+	    "pem": "../wallet/wallet-owner.pem",
+            "gas-limit": 100000000,
+	    "outfile": "test.json",
+            "send": true
+        }
+     }
+}
