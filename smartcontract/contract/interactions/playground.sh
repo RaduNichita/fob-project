@@ -6,10 +6,10 @@ CHAIN="D"
 ISSUE_ADDRESS="erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
 
 WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru" # Change if you want to use other user
-WALLET_PATH="~/ping-pong/wallet/wallet-owner.pem" # Change if you want to use other user
+WALLET_PATH="~/Desktop/fo/fob-project/smartcontract/wallet/wallet-owner.pem" # Change if you want to use other user
 
 OWNER_WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru"
-OWNER_WALLET_PATH="~/ping-pong/wallet/wallet-owner.pem" # Change if you want to use other user
+OWNER_WALLET_PATH="~/Desktop/fo/fob-project/smartcontract/wallet/wallet-owner.pem" # Change if you want to use other user
 
 ALICE_WALLET_ADDRESS=
 _WALLET_PATH=
@@ -41,7 +41,7 @@ function convert_to_hex() {
 }
 
 function convert_contract_address_to_hex() {
-	echo "0x"$(erdpy wallet bech32 --decode $1)
+	echo "0x"$(mxpy wallet bech32 --decode $1)
 }
 
 function get_token_identifier() {
@@ -52,8 +52,8 @@ function issue_nft() {
 
 	nft_token_name_encoded=$(convert_to_hex $NFT_TOKEN_NAME)
 	nft_token_ticker_encoded=$(convert_to_hex $NFT_TOKEN_TICKER)
-
-	erdpy contract call $ISSUE_ADDRESS \
+	
+	mxpy contract call $ISSUE_ADDRESS \
 		--function "issueNonFungible" \
 		--pem $WALLET_PATH \
 		--gas-limit 100000000 \
@@ -62,6 +62,7 @@ function issue_nft() {
 		--chain $CHAIN \
 		--value 50000000000000000 \
 		--proxy $PROXY \
+		--wait-result \
 		--send
 }
 
@@ -72,7 +73,7 @@ function set_role_nft() {
 	create_role_encoded=$(convert_to_hex $role)
 	get_token_identifier_encoded=$(convert_to_hex $(get_token_identifier))
 
-	erdpy contract call $ISSUE_ADDRESS \
+	mxpy contract call $ISSUE_ADDRESS \
 		--function "setSpecialRole" \
 		--pem $WALLET_PATH \
 		--gas-limit 100000000 \
@@ -180,10 +181,10 @@ function transfer_nft() {
 	--send
 }
 
-# issue_nft
-# set_role_nft
+issue_nft
+set_role_nft
 # create_nft
 # transfer_nft_to_smart_contract 1
 # register_participant $1 $2
 # bid_participant $1 $2
-transfer_nft
+# transfer_nft
