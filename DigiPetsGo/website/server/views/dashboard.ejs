@@ -54,19 +54,60 @@
 
         <div class="mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title mdl-color--red-100 mdl-color-text--white">
-                <h2 class="mdl-card__title-text"><b>Card Title</b></h2>
+                <h2 class="mdl-card__title-text"><b>Create and Send your Digipets!</b></h2>
             </div>
             <div class="mdl-card__supporting-text">
-                <h5>ABC<h5>
+                <h1>    </h1>
+                <p style="text-align: center;">
+                    <button class="button button3" onclick="location.href='/newdigipet/<%= username %>'"  style="vertical-align:middle"><span>Create DigiPet</span></button>
+                    <button class="button button3" onclick="location.href='/senddigipet/<%= username %>'" style="vertical-align:middle"><span>Send DigiPet</span></button>
+                    <br>
+                    <button id='transfer' class="button button3" onclick="location.href='/transferdigipet/<%= username %>'" style="vertical-align:middle"><span>Transfter DigiPet</span></button>
+                    <script>
+                        const transferBtn = document.getElementById("transfer");
+                        console.log(transferBtn.style.display);
+                        transferBtn.style.display = 'none';
+                        const user = '<%= username %>';
+                        console.log(user);
+                        if (user !== "mzzmara") {
+                            transferBtn.style.display = "none";
+                        } else {
+                            transferBtn.style.display = "";
+                        }
+                    </script>
+                </p>
             </div>
         </div>
 
         <div class="mdl-cell mdl-cell--4-col mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title mdl-color--deep-orange-100 mdl-color-text--white">
-                <h2 class="mdl-card__title-text"><b>Card Title</b></h2>
+                <h2 class="mdl-card__title-text"><b>Register and bid your DigiPets!</b></h2>
             </div>
             <div class="mdl-card__supporting-text">
-                <h5>ABC<h5>
+                <h1>    </h1>
+                <p style="text-align: center;">
+                    <button class="button button4" onclick="location.href='/registerauction/<%= username %>'"  style="vertical-align:middle"><span>Register</span></button>
+                    <button id="bid" class="button button4" style="vertical-align:middle"><span>Bid</span></button>
+                    <form action="/biddigipet/<%= username %>" method="post">
+                        <div id='bid_info' class="form-group" >
+                            <h5><label>Enter EGLD</label></h5>
+                            <input type="number" class="form-control" name="egld" required="required">
+                            <button type="submit" class="button button4" style="display: inline;vertical-align:middle"><span>Confirm</span></button>
+                        </div>
+                    </form>
+                </p>
+                <script>
+                    const targetDiv = document.getElementById("bid_info");
+                    targetDiv.style.display = "none";
+                    const btn = document.getElementById("bid");
+                    btn.onclick = function () {
+                    if (targetDiv.style.display !== "none") {
+                        targetDiv.style.display = "none";
+                    } else {
+                        targetDiv.style.display = "block";
+                    }
+                    };
+                </script>
             </div>
         </div>
     </div>

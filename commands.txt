@@ -1,0 +1,19 @@
+var collections = db.getCollectionNames();
+for(var i = 0; i< collections.length; i++){
+   print('Collection: ' + collections[i]); // print the name of each collection
+   db.getCollection(collections[i]).find().forEach(printjson); //and then print the json of each of its elements
+}
+
+
+db.userdata.updateOne(
+   { username: 'mzzmara' },
+   { $set:
+      {
+        wallet: '-----BEGIN PRIVATE KEY for erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru-----\n' +
+'YjdhNDQxYjRjYWI0ZDhmZWNhMzcxYzg2NTJjYzBiZjE2YTMxN2IzMzE3MDU0N2Y5\n' +
+'MWFlZWE5Y2FkMWQ1NDc4ZTI2YTM2ZjYxMTJhNDhmYzgyMzc5NjY4NDI1Y2QwN2Nl\n' +
+'NDliNDlkNmNjMTM4NmQwNTk5YWM1YzRlZjc3OGU0N2M=\n' +
+'-----END PRIVATE KEY for erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru-----'
+      }
+   }
+)

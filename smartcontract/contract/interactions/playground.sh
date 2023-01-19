@@ -2,21 +2,20 @@
 
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN="D"
-blockchain_cli="mxpy"
 
 ISSUE_ADDRESS="erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
 
 WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru" # Change if you want to use other user
-WALLET_PATH="~/Desktop/fo/fob-project/smartcontract/wallet/wallet-owner.pem" # Change if you want to use other user
+WALLET_PATH="~/fob-project/wallets/wallet.pem" # Change if you want to use other user
 
 OWNER_WALLET_ADDRESS="erd1y63k7cgj5j8usgmev6zztng8eeymf8tvcyux6pve43wyaamcu37qekzfru"
-OWNER_WALLET_PATH="~/Desktop/fo/fob-project/smartcontract/wallet/wallet-owner.pem" # Change if you want to use other user
+OWNER_WALLET_PATH="~/fob-project/wallets/wallet.pem" # Change if you want to use other user
 
 ALICE_WALLET_ADDRESS=
 _WALLET_PATH=
 
 
-SMART_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqc6n95pm3rauxmwjllzktcdw2v96u3kr9u37qdkctcz"
+SMART_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqyw0dqwpf6xqy3s2vyy7ezc3c8s4k96zyu37qe42306"
 
 NFT_TOKEN_NAME="RaduMaraCristi"
 NFT_TOKEN_TICKER="RMC"
@@ -30,7 +29,7 @@ AUCTION_DURATION=500 # in seconds
 AUCTION_MAX_PARTICIPANTS=0x5
 
 function create_wallet() {
-	$blockchain_cli wallet new --pem --output-path $1.pem
+	erdpy wallet new --pem --output-path $1.pem
 }
 
 function convert_to_hex_helper() {
@@ -42,7 +41,7 @@ function convert_to_hex() {
 }
 
 function convert_contract_address_to_hex() {
-	echo "0x"$($blockchain_cli wallet bech32 --decode $1)
+	echo "0x"$(erdpy wallet bech32 --decode $1)
 }
 
 function get_token_identifier() {
@@ -53,8 +52,8 @@ function issue_nft() {
 
 	nft_token_name_encoded=$(convert_to_hex $NFT_TOKEN_NAME)
 	nft_token_ticker_encoded=$(convert_to_hex $NFT_TOKEN_TICKER)
-	
-	$blockchain_cli contract call $ISSUE_ADDRESS \
+
+	erdpy contract call $ISSUE_ADDRESS \
 		--function "issueNonFungible" \
 		--pem $WALLET_PATH \
 		--gas-limit 100000000 \
@@ -63,7 +62,6 @@ function issue_nft() {
 		--chain $CHAIN \
 		--value 50000000000000000 \
 		--proxy $PROXY \
-		--wait-result \
 		--send
 }
 
@@ -74,7 +72,7 @@ function set_role_nft() {
 	create_role_encoded=$(convert_to_hex $role)
 	get_token_identifier_encoded=$(convert_to_hex $(get_token_identifier))
 
-	$blockchain_cli contract call $ISSUE_ADDRESS \
+	erdpy contract call $ISSUE_ADDRESS \
 		--function "setSpecialRole" \
 		--pem $WALLET_PATH \
 		--gas-limit 100000000 \
@@ -96,7 +94,7 @@ function create_nft() {
 	nft_attributes_encoded=$(convert_to_hex $NFT_ATTRIBUTES)
 	nft_url_encoded=$(convert_to_hex $NFT_URL)
 
-	$blockchain_cli contract call $WALLET_ADDRESS \
+	erdpy contract call $WALLET_ADDRESS \
 	--function "ESDTNFTCreate" \
 	--pem $WALLET_PATH \
 	--gas-limit=10000000 \
@@ -128,7 +126,7 @@ function transfer_nft_to_smart_contract() {
 	argument2_encoded=$(convert_to_hex $argument2)
 
 
-	$blockchain_cli contract call $WALLET_ADDRESS \
+	erdpy contract call $WALLET_ADDRESS \
 	--function "ESDTNFTTransfer" \
 	--pem $WALLET_PATH \
 	--gas-limit=10000000 \
@@ -144,7 +142,7 @@ function transfer_nft_to_smart_contract() {
 function register_participant() {
 	participant_name_encoded=$(convert_to_hex $2)
 
-	$blockchain_cli contract call $SMART_CONTRACT_ADDRESS \
+	erdpy contract call $SMART_CONTRACT_ADDRESS \
 	--function "register_participant" \
 	--pem $1 \
 	--gas-limit=10000000 \
@@ -159,7 +157,7 @@ function register_participant() {
 # second parameter - amount to bid
 function bid_participant() {
 
-	$blockchain_cli contract call $SMART_CONTRACT_ADDRESS \
+	erdpy contract call $SMART_CONTRACT_ADDRESS \
 	--function "bid_participant" \
 	--pem $1\
 	--gas-limit=10000000 \
@@ -172,7 +170,7 @@ function bid_participant() {
 
 # only owner
 function transfer_nft() {
-	$blockchain_cli contract call $SMART_CONTRACT_ADDRESS \
+	erdpy contract call $SMART_CONTRACT_ADDRESS \
 	--function "transfer_nft" \
 	--pem $WALLET_PATH \
 	--gas-limit=10000000 \
@@ -182,8 +180,8 @@ function transfer_nft() {
 	--send
 }
 
-issue_nft
-set_role_nft
+# issue_nft
+# set_role_nft
 # create_nft
 # transfer_nft_to_smart_contract 1
 # register_participant $1 $2
