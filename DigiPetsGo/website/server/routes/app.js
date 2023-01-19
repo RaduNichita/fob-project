@@ -7,8 +7,11 @@ const TIME_INTERVAL = 60 * 60 * 5 * 1000;
 var jwt = require('jsonwebtoken');
 var request = require('request-promise');
 var uniqid = require('uniqid');
-var NFTS_COUNT = 21;
+var NFTS_COUNT = 24;
 var NFT_TOKEN_TICKER_IDENTIFIER="RMC-ce2cc0"
+
+// Execute shell commands
+const { exec } = require("child_process");
 
 // Import the MongoDB driver
 const MongoClient = require('mongodb').MongoClient;
@@ -90,8 +93,6 @@ router.post('/register', (req, res) => {
                                 });
                             } else {
                                 // Insert new user into the "userdata" collection
-                                const { exec } = require("child_process");
-
                                 exec("erdpy wallet derive wallet.pem", (error, stdout, stderr) => {
                                     exec("cat wallet.pem", (error, stdout, stderr) => {
                                         // Insert new user into the "userdata" collection
@@ -146,8 +147,6 @@ router.post('/register', (req, res) => {
                                 message: err
                             });
                         } else {
-                            const { exec } = require("child_process");
-
                             exec("erdpy wallet derive wallet.pem", (error, stdout, stderr) => {
                                 exec("cat wallet.pem", (error, stdout, stderr) => {
                                     // Insert new user into the "userdata" collection
@@ -297,8 +296,6 @@ router.get('/dashboard/:username', (req, res) => {
 });
 
 router.get('/newdigipet/:username', (req, res) => {
-    const { exec } = require("child_process");
-
     exec('bash -c "source ~/fob-project/smartcontract/contract/interactions/playground.sh && create_nft"', (error, stdout, stderr) => {
         let lines = `${stderr}`.split('\n');
         let words = lines[4].split(':');
@@ -349,7 +346,6 @@ router.get('/newdigipet/:username', (req, res) => {
                         db.collection("pets").insertOne(newPet, function(err) {
                             client.close();
                         });
-
                     });
                 }
             });
@@ -361,6 +357,54 @@ router.get('/newdigipet/:username', (req, res) => {
         });
 
         NFTS_COUNT++;
+    });
+});
+
+router.get('/senddigipet/:username', (req, res) => {
+    console.log('send digipet');
+    let username = req.params.username;
+    let devnet_link = '';
+
+    // Create a new MongoClient
+    const client = new MongoClient(url);
+
+    // Use connect method to connect to the server
+    client.connect(function(err) {
+        if (err) {
+            console.log('Error connecting to DB!');
+            client.close();
+            return res.redirect('dashboard' + username);
+        }
+
+        // Connected successfully
+        const db = client.db(dbName);
+        console.log('Connected successfully to digipetsgo!');
+
+        // Find if username or email is already in use
+        db.collection('pets').find({ owner: username
+        }).toArray(function(err, docs) {
+            if (docs.length > 0) {
+                // User exists, check password
+                let pet = docs[0];
+                let command  = 'bash -c "source ~/fob-project/smartcontract/contract/interactions/playground.sh && transfer_nft_to_smart_contract ' + pet.count + '"';
+                exec(command, (error, stdout, stderr) => {
+                    let lines = `${stderr}`.split('\n');
+                    let words = lines[4].split(':');
+                    devnet_link = words[3].substring(1) + ':' + words[4];
+                    console.log(devnet_link);
+                });
+            } else {
+                res.render('newdigipet', {
+                    username: req.params.username,
+                    devnet_link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley",
+                });
+            }
+        });
+    });
+
+    res.render('newdigipet', {
+        username: req.params.username,
+        devnet_link: devnet_link,
     });
 });
 
