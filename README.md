@@ -25,10 +25,9 @@ Please open an issue if you feel something is missing from the install script
 
 ## How to run:
 
-- start the InfluxDB container separately
+- start the MongoDB container separately
     - go the the `./backend` directory and start the container using the `run.sh` script
     - make sure that the container is up and running
-    - update the database accordingly if necessary (connect to its shell and follow the *InfluxDB tutorial section*)
 - in `./website` directory run : `npm run start`
 - to access the frontend, use `localhost:3001`
 - remember to do the clean up running `clean.sh`
